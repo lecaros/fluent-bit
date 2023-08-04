@@ -1627,6 +1627,7 @@ char *flb_tail_file_name(struct flb_tail_file *file)
 
     ret = fcntl(file->fd, F_GETPATH, path);
     if (ret == -1) {
+        flb_error("path: %s, fd:%i\n", path, file->fd);
         flb_errno();
         flb_free(buf);
         return NULL;
