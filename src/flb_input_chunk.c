@@ -1565,6 +1565,7 @@ static int input_chunk_append_raw(struct flb_input_instance *in,
     }
 
     /* Make sure the data was not filtered out and the buffer size is zero */
+    flb_info("[check] content_size=%zu", content_size);
     if (content_size == 0) {
         flb_input_chunk_destroy(ic, FLB_TRUE);
         flb_input_chunk_set_limits(in);
