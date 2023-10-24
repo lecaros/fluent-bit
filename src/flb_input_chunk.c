@@ -1178,11 +1178,20 @@ size_t flb_input_chunk_set_limits(struct flb_input_instance *in)
      * After the adjustments, validate if the plugin is overlimit or paused
      * and perform further adjustments.
      */
+    flb_info("[check] %s mem_buf_status=%i storage_buf_status=%i",
+             in->name, in->mem_buf_status, in->storage_buf_status);
+    flb_info("[check] flb_input_chunk_is_mem_overlimit=%i flb_input_chunk_is_storage_overlimit=%i",
+             flb_input_chunk_is_mem_overlimit(in),
+             flb_input_chunk_is_storage_overlimit(in));
+    flb_info("[check] is_running=%i is_ingestion_active=%i",
+             in->config->is_running,
+             in->config->is_ingestion_active);
     if (flb_input_chunk_is_mem_overlimit(in) == FLB_FALSE &&
         in->config->is_running == FLB_TRUE &&
         in->config->is_ingestion_active == FLB_TRUE &&
         in->mem_buf_status == FLB_INPUT_PAUSED) {
         in->mem_buf_status = FLB_INPUT_RUNNING;
+        flb_info("[check] in->p->cb_resume=%p", in->p->cb_resume);
         if (in->p->cb_resume) {
             flb_input_resume(in);
             flb_info("[input] %s resume (mem buf overlimit)",
