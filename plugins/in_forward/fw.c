@@ -261,7 +261,9 @@ static void in_fw_pause(void *data, struct flb_config *config)
      * This socket stop is a workaround since the server API will be
      * refactored shortly.
      */
+    flb_info("[check] is_ingestion_active=%i", config->is_ingestion_active);
     if (config->is_ingestion_active == FLB_FALSE) {
+        flb_info("[check] closing collector FD=%i", ctx->coll_fd);
         fw_conn_del_all(ctx);
     }
 }
