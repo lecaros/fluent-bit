@@ -1121,6 +1121,8 @@ static inline int flb_input_chunk_is_mem_overlimit(struct flb_input_instance *i)
         return FLB_FALSE;
     }
 
+    flb_info("[check] %s mem_chunks_size=%zu mem_buf_limit=%zu",
+             i->name, i->mem_chunks_size, i->mem_buf_limit);
     if (i->mem_chunks_size >= i->mem_buf_limit) {
         return FLB_TRUE;
     }
