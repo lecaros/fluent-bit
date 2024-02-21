@@ -1168,7 +1168,7 @@ char *flb_msgpack_to_json_str(size_t size, const msgpack_object *obj)
         ret = flb_msgpack_to_json(buf, size, obj);
         if (ret <= 0) {
             /* buffer is small. retry.*/
-            size += 128;
+            size += 4096;
             tmp = flb_realloc(buf, size);
             if (tmp) {
                 buf = tmp;
