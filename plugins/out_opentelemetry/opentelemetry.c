@@ -169,6 +169,13 @@ int opentelemetry_http_post(struct opentelemetry_context *ctx,
          * - 205: Reset content
          *
          */
+        //print resp.status and resp.payload
+        flb_debug("[otel] response status: %i", c->resp.status);
+        flb_debug("[otel] response payload: %s", c->resp.payload);
+        flb_debug("[otel] connection host: %s", c->host);
+        flb_debug("[otel] connection port: %d", c->port);
+        flb_debug("[otel] connection uri: %s", c->uri);
+
         if (c->resp.status < 200 || c->resp.status > 205) {
             if (ctx->log_response_payload &&
                 c->resp.payload != NULL &&

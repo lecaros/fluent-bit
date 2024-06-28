@@ -1360,6 +1360,14 @@ int flb_http_do(struct flb_http_client *c, size_t *bytes)
     int ret;
 
     ret = flb_http_do_request(c, bytes);
+    // print request details
+    flb_debug("[http_client] request: %s", c->header_buf);
+    flb_debug("[http_client] request body: %s", c->body_buf);
+    flb_debug("[http_client] request body length: %d", c->body_len);
+    flb_debug("[http_client] request host: %s", c->host);
+    flb_debug("[http_client] request port: %d", c->port);
+    flb_debug("[http_client] request uri: %s", c->uri);
+
     if (ret != 0) {
         return ret;
     }
