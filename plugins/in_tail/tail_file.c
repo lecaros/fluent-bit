@@ -876,7 +876,7 @@ static int set_file_position(struct flb_tail_config *ctx,
     }
     file->offset = ret;
 
-    if (file->decompression_context == NULL) {        
+    if (file->decompression_context == NULL) {
         file->stream_offset = ret;
     }
 
@@ -948,6 +948,12 @@ int flb_tail_file_append(char *path, struct stat *st, int mode,
         flb_debug("[in_tail] file %s already registered", path);
         return -1;
     }
+
+    #ifdef __linux__
+    if (ctx->file_cache_advise) {
+        flb_plg_debug(ctx->ins, "file will be read in POSIX_FADV_DONTNEED mode %s", path);
+    }
+    #endif
 
     fd = open(path, O_RDONLY);
     if (fd == -1) {
@@ -1041,8 +1047,9 @@ int flb_tail_file_append(char *path, struct stat *st, int mode,
      * for path_key to continue working after rotation. */
     file->orig_name = flb_strdup(file->name);
     if (!file->orig_name) {
-        flb_free(file->name);
         flb_errno();
+        flb_free(file->name);
+        file->name = NULL;
         goto error;
     }
     file->orig_name_len = file->name_len;
@@ -1438,6 +1445,15 @@ int flb_tail_file_chunk(struct flb_tail_file *file)
 
         file_buffer_capacity = (file->buf_size - file->buf_len) - 1;
     }
+
+    #ifdef __linux__
+    if (ctx->file_cache_advise) {
+        if (posix_fadvise(file->fd, 0, 0, POSIX_FADV_DONTNEED) == -1) {
+            flb_errno();
+            flb_plg_error(ctx->ins, "error during posix_fadvise");
+        }
+    }
+    #endif
 
     read_size = file_buffer_capacity;
 
