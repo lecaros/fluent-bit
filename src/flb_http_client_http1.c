@@ -479,6 +479,8 @@ int flb_http1_request_commit(struct flb_http_request *request)
         return -7;
     }
 
+    request_buffer = sds_result;
+
     if (request->body != NULL) {
         sds_result = cfl_sds_cat(request_buffer,
                                  request->body,
@@ -525,6 +527,9 @@ static int compose_request_line(cfl_sds_t *output_buffer,
     }
     else if (request->protocol_version == HTTP_PROTOCOL_VERSION_09) {
         protocol_version_string = "";
+    }
+    else {
+        return -1;
     }
 
     method_name = flb_http_get_method_string_from_id(request->method);

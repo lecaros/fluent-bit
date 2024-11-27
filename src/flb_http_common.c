@@ -150,6 +150,10 @@ struct flb_http_request *flb_http_request_create()
 
 void flb_http_request_destroy(struct flb_http_request *request)
 {
+    if (request->authority != NULL) {
+         cfl_sds_destroy(request->authority);
+    }
+
     if (request->path != NULL) {
          cfl_sds_destroy(request->path);
     }
@@ -519,6 +523,15 @@ int flb_http_request_set_url(struct flb_http_request *request,
         return -1;
     }
 
+    start_of_authorization = NULL;
+    start_of_query_string = NULL;
+    start_of_authority = NULL;
+    start_of_username = NULL;
+    start_of_password = NULL;
+    start_of_port = NULL;
+    start_of_host = NULL;
+    start_of_path = NULL;
+
     start_of_authority = strstr(local_url, "://");
 
     if (start_of_authority == NULL) {
@@ -645,6 +658,12 @@ int flb_http_request_set_url(struct flb_http_request *request,
 int flb_http_request_set_uri(struct flb_http_request *request,
                              char *uri)
 {
+    if (request->path != NULL) {
+        cfl_sds_destroy(request->path);
+
+        request->path = NULL;
+    }
+
     request->path = cfl_sds_create(uri);
 
     if (request->path == NULL) {
@@ -657,6 +676,12 @@ int flb_http_request_set_uri(struct flb_http_request *request,
 int flb_http_request_set_query_string(struct flb_http_request *request,
                                       char *query_string)
 {
+    if (request->query_string != NULL) {
+        cfl_sds_destroy(request->query_string);
+
+        request->query_string = NULL;
+    }
+
     request->query_string = cfl_sds_create(query_string);
 
     if (request->query_string == NULL) {
@@ -669,6 +694,12 @@ int flb_http_request_set_query_string(struct flb_http_request *request,
 int flb_http_request_set_content_type(struct flb_http_request *request,
                                       char *content_type)
 {
+    if (request->content_type != NULL) {
+        cfl_sds_destroy(request->content_type);
+
+        request->content_type = NULL;
+    }
+
     request->content_type = cfl_sds_create(content_type);
 
     if (request->content_type == NULL) {
@@ -681,6 +712,12 @@ int flb_http_request_set_content_type(struct flb_http_request *request,
 int flb_http_request_set_user_agent(struct flb_http_request *request,
                                     char *user_agent)
 {
+    if (request->user_agent != NULL) {
+        cfl_sds_destroy(request->user_agent);
+
+        request->user_agent = NULL;
+    }
+
     request->user_agent = cfl_sds_create(user_agent);
 
     if (request->user_agent == NULL) {
