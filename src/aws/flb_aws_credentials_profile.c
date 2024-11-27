@@ -616,7 +616,7 @@ static int get_shared_config_credentials(char* config_path,
     *creds = NULL;
     *expiration = 0;
 
-    AWS_CREDS_DEBUG("Reading shared config file.");
+    AWS_CREDS_WARN("Reading shared config file: %s", config_path);
 
     if (flb_read_file(config_path, &buf, &size) < 0) {
         if (errno == ENOENT) {
@@ -659,7 +659,7 @@ static int get_shared_credentials(char* credentials_path,
         goto end;
     }
 
-    AWS_CREDS_DEBUG("Reading shared credentials file.");
+    AWS_CREDS_WARN("Reading shared credentials file: %s", credentials_path);
 
     if (flb_read_file(credentials_path, &buf, &size) < 0) {
         if (errno == ENOENT) {
