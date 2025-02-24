@@ -71,6 +71,7 @@ extern struct flb_aws_error_reporter *error_reporter;
 #endif
 
 #include <ctraces/ctr_version.h>
+#include <fluent-bit/flb_output_plugin.h>
 
 static pthread_once_t local_thread_engine_evl_init = PTHREAD_ONCE_INIT;
 FLB_TLS_DEFINE(struct mk_event_loop, flb_engine_evl);
@@ -126,6 +127,8 @@ void flb_engine_reschedule_retries(struct flb_config *config)
     struct flb_input_instance *ins;
     struct flb_task_retry *retry;
 
+    flb_info("engine reschedule retries");
+
     /* Invalidate and reschedule all retry tasks to be retried immediately */
     mk_list_foreach(head, &config->inputs) {
         ins = mk_list_entry(head, struct flb_input_instance, _head);
@@ -154,6 +157,8 @@ int flb_engine_flush(struct flb_config *config,
     struct flb_input_instance *in;
     struct flb_input_plugin *p;
     struct mk_list *head;
+
+    flb_info("engine flush");
 
     mk_list_foreach(head, &config->inputs) {
         in = mk_list_entry(head, struct flb_input_instance, _head);
@@ -187,6 +192,8 @@ static inline int handle_input_event(flb_pipefd_t fd, uint64_t ts,
     uint32_t type;
     uint32_t ins_id;
     uint64_t val;
+
+    flb_info("handle input event");
 
     bytes = flb_pipe_r(fd, &val, sizeof(val));
     if (bytes == -1) {
@@ -236,6 +243,8 @@ static inline int handle_output_event(uint64_t ts,
     struct flb_task *task;
     struct flb_task_retry *retry;
     struct flb_output_instance *ins;
+
+    flb_info("handle output event");
 
     /* Get type and key */
     type = FLB_BITS_U64_HIGH(val);
@@ -479,6 +488,7 @@ static inline int handle_output_events(flb_pipefd_t fd,
     size_t   index;
     uint64_t ts;
 
+    flb_info("handle output events");
     memset(&values, 0, sizeof(values));
 
     bytes = flb_pipe_r(fd, &values, sizeof(values));
@@ -549,6 +559,8 @@ static FLB_INLINE int flb_engine_handle_event(flb_pipefd_t fd, int mask,
                                               struct flb_config *config)
 {
     int64_t ret;
+
+    flb_info("engine handle event");
 
     /* flb_engine_shutdown was already initiated */
     if (config->is_running == FLB_FALSE) {
@@ -642,6 +654,8 @@ static int flb_engine_log_start(struct flb_config *config)
     int type;
     int level;
 
+    flb_info("engine log start");
+
     /* Log Level */
     if (config->verbose != FLB_LOG_INFO) {
         level = config->verbose;
@@ -695,6 +709,8 @@ int flb_engine_start(struct flb_config *config)
     struct flb_sched *sched;
     struct flb_net_dns dns_ctx;
     struct flb_notification *notification;
+
+    flb_info("engine start");
 
     /* Initialize the networking layer */
     flb_net_lib_init();
@@ -1131,6 +1147,8 @@ int flb_engine_shutdown(struct flb_config *config)
 {
     struct flb_sched_timer_coro_cb_params *sched_params;
 
+    flb_info("engine shutdown");
+
     config->is_running = FLB_FALSE;
     flb_input_pause_all(config);
 
@@ -1194,6 +1212,8 @@ int flb_engine_exit(struct flb_config *config)
 {
     int ret;
     uint64_t val;
+
+    flb_info("engine exit");
 
     val = FLB_ENGINE_EV_STOP;
     ret = flb_pipe_w(config->ch_manager[1], &val, sizeof(uint64_t));
