@@ -332,6 +332,8 @@ int sb_segregate_chunks(struct flb_config *config)
     struct cio_stream *stream;
     struct cio_chunk  *chunk;
 
+    flb_info("segregate chunks");
+
     context = sb_get_context(config);
 
     if (context == NULL) {
