@@ -1444,6 +1444,8 @@ static struct flb_input_collector *collector_create(int type,
     struct flb_input_collector *coll;
     struct flb_input_thread_instance *thi;
 
+    flb_info("collector create");
+
     coll = flb_calloc(1, sizeof(struct flb_input_collector));
     if (!coll) {
         flb_errno();
@@ -1550,6 +1552,8 @@ static int collector_start(struct flb_input_collector *coll,
     int ret;
     struct mk_event *event;
 
+    flb_info("collector start");
+
     if (coll->running == FLB_TRUE) {
         return 0;
     }
@@ -1591,6 +1595,8 @@ int flb_input_collector_start(int coll_id, struct flb_input_instance *in)
     int ret;
     struct mk_list *head;
     struct flb_input_collector *coll;
+
+    flb_info("input collector install");
 
     mk_list_foreach(head, &in->collectors) {
         coll = mk_list_entry(head, struct flb_input_collector, _head);
@@ -1641,6 +1647,8 @@ int flb_input_collectors_start(struct flb_config *config)
     struct mk_list *head;
     struct flb_input_instance *ins;
 
+    flb_info("input collectors start");
+
     /* Signal threaded input plugins to start their collectors */
     mk_list_foreach(head, &config->inputs) {
         ins = mk_list_entry(head, struct flb_input_instance, _head);
@@ -1683,6 +1691,8 @@ int flb_input_collector_running(int coll_id, struct flb_input_instance *in)
 {
     struct flb_input_collector *coll;
 
+    flb_info("input collector running");
+
     coll = get_collector(coll_id, in);
     if (!coll) {
         return FLB_FALSE;
@@ -1695,6 +1705,7 @@ struct mk_event *flb_input_collector_get_event(int coll_id,
                                                struct flb_input_instance *ins)
 {
     struct flb_input_collector *collector;
+    flb_info("input collector get event");
 
     collector = get_collector(coll_id, ins);
 
@@ -1838,6 +1849,8 @@ int flb_input_collector_pause(int coll_id, struct flb_input_instance *in)
     flb_pipefd_t fd;
     struct flb_input_collector *coll;
 
+    flb_info("input collector_pause");
+
     coll = get_collector(coll_id, in);
     if (!coll) {
         return -1;
@@ -1903,6 +1916,8 @@ int flb_input_collector_resume(int coll_id, struct flb_input_instance *in)
     struct flb_config *config;
     struct mk_event *event;
 
+    flb_info("input collector resume");
+
     coll = get_collector(coll_id, in);
     if (!coll) {
         return -1;
@@ -1961,6 +1976,7 @@ int flb_input_collector_fd(flb_pipefd_t fd, struct flb_config *config)
     struct flb_input_collector *collector = NULL;
     struct flb_input_coro *input_coro;
 
+    flb_info("input collector fd");
     mk_list_foreach(head, &config->inputs) {
         ins = mk_list_entry(head, struct flb_input_instance, _head);
         mk_list_foreach(head_coll, &ins->collectors) {
