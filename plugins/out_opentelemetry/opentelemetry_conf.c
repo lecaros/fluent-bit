@@ -277,13 +277,19 @@ struct opentelemetry_context *flb_opentelemetry_context_create(struct flb_output
         return NULL;
     }
 
+    ret = check_proxy(ins, ctx, host, port, protocol, logs_uri);
+    if (ret == -1) {
+        flb_opentelemetry_context_destroy(ctx);
+        return NULL;
+    }
+
     ret = check_proxy(ins, ctx, host, port, protocol, metrics_uri);
     if (ret == -1) {
         flb_opentelemetry_context_destroy(ctx);
         return NULL;
     }
 
-    ret = check_proxy(ins, ctx, host, port, protocol, logs_uri);
+    ret = check_proxy(ins, ctx, host, port, protocol, traces_uri);
     if (ret == -1) {
         flb_opentelemetry_context_destroy(ctx);
         return NULL;
@@ -496,7 +502,7 @@ struct opentelemetry_context *flb_opentelemetry_context_create(struct flb_output
         flb_plg_error(ins, "failed to create record accessor for resource attributes");
     }
 
-    ctx->ra_resource_schema_url = flb_ra_create("$schema_url", FLB_FALSE);
+    ctx->ra_resource_schema_url = flb_ra_create("$resource['schema_url']", FLB_FALSE);
     if (ctx->ra_resource_schema_url == NULL) {
         flb_plg_error(ins, "failed to create record accessor for resource schema url");
     }
@@ -514,6 +520,11 @@ struct opentelemetry_context *flb_opentelemetry_context_create(struct flb_output
     ctx->ra_scope_attr = flb_ra_create("$scope['attributes']", FLB_FALSE);
     if (ctx->ra_scope_attr == NULL) {
         flb_plg_error(ins, "failed to create record accessor for scope attributes");
+    }
+
+    ctx->ra_scope_schema_url = flb_ra_create("$scope['schema_url']", FLB_FALSE);
+    if (ctx->ra_scope_schema_url == NULL) {
+        flb_plg_error(ins, "failed to create record accessor for resource schema url");
     }
 
     /* log metadata under $otlp (set by in_opentelemetry) */
@@ -710,6 +721,9 @@ void flb_opentelemetry_context_destroy(struct opentelemetry_context *ctx)
     }
     if (ctx->ra_scope_attr) {
         flb_ra_destroy(ctx->ra_scope_attr);
+    }
+    if (ctx->ra_scope_schema_url) {
+        flb_ra_destroy(ctx->ra_scope_schema_url);
     }
 
     if (ctx->ra_log_meta_otlp_observed_ts) {
